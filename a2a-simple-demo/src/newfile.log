@@ -1,0 +1,18 @@
+2025-08-21 18:18:56,941 Initializing server 'CurrencyMCP'
+2025-08-21 18:18:56,941 Registering handler for ListToolsRequest
+2025-08-21 18:18:56,941 Registering handler for ListResourcesRequest
+2025-08-21 18:18:56,943 Registering handler for ListResourceTemplatesRequest
+2025-08-21 18:18:56,943 Registering handler for PromptListRequest
+2025-08-21 18:18:56,943 Registering handler for CallToolRequest
+2025-08-21 18:18:56,943 Registering handler for ReadResourceRequest
+2025-08-21 18:18:56,943 Registering handler for GetPromptRequest
+2025-08-21 18:18:56,954 Initializing server 'DatetimeMCP'
+2025-08-21 18:18:56,954 Registering handler for ListToolsRequest
+2025-08-21 18:18:56,954 Registering handler for ListResourcesRequest
+2025-08-21 18:18:56,954 Registering handler for ListResourceTemplatesRequest
+2025-08-21 18:18:56,954 Registering handler for PromptListRequest
+2025-08-21 18:18:56,954 Registering handler for CallToolRequest
+2025-08-21 18:18:56,954 Registering handler for ReadResourceRequest
+2025-08-21 18:18:56,954 Registering handler for GetPromptRequest
+2025-08-21 18:18:58,530 Using selector: SelectSelector
+2025-08-21 18:18:58,532 Using selector: SelectSelector

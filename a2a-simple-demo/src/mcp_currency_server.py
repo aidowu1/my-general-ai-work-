@@ -5,37 +5,52 @@ from starlette.routing import Mount
 from fastmcp import FastMCP
 import uvicorn
 
-mcp = FastMCP("CurrencyMCP")
+import configs
+import simple_logger
 
-@mcp.tool()
-def convert_currency(amount: float, from_currency: str, to_currency: str) -> dict:
+class CurrencyConverterMcpService:
     """
-    Simple example: returns converted amount and the implied rate.
-    (Production: call a real FX API and secure it.)
+    Currency converter service.
+    This is a simple example that uses hardcoded exchange rates.
+    In production, you would call a real FX API and secure it.
     """
-    rates = {"USD": 1.0, "EUR": 0.92, "GBP": 0.80, "JPY": 150.0}
-    from_currency = from_currency.upper()
-    to_currency = to_currency.upper()
-    if from_currency not in rates or to_currency not in rates:
-        raise ValueError("unsupported currency")
-    rate = rates[to_currency] / rates[from_currency]
-    converted = amount * rate
-    return {"converted": round(converted, 6), "rate": round(rate, 8)}
 
-# Create the ASGI app
-# mcp_app = mcp.http_app(path='/mcp')
+    logger = simple_logger.SimpleLogger().logger
+    mcp = FastMCP("CurrencyMCP")
 
-# mount the FastMCP ASGI app at /mcp
-#app = Starlette(routes=[Mount("/mcp", app=mcp.http_app(path='/mcp'))])
+    @staticmethod
+    @mcp.tool()
+    def convert_currency(
+        amount: float, 
+        from_currency: str, 
+        to_currency: str
+    ) -> dict:
+        """
+        Simple example: returns converted amount and the implied rate.
+        (Production: call a real FX API and secure it.)
+        :param amount: Amount to convert
+        :param from_currency: Currency to convert from (e.g. "USD")
+        :param to_currency: Currency to convert to (e.g. "EUR")
+        :return: Dictionary with converted amount and rate
+        """
+        #rates = {"USD": 1.0, "EUR": 0.92, "GBP": 0.80, "JPY": 150.0}
+        from_currency = from_currency.upper()
+        to_currency = to_currency.upper()
+        CurrencyConverterMcpService.logger.info(f"from_currency: {from_currency}, to_currency: {to_currency}, amount: {amount}")
+        
+        if from_currency not in configs.RATES or to_currency not in configs.RATES:
+            raise ValueError("unsupported currency")
+        rate = configs.RATES[to_currency] / configs.RATES[from_currency]
+        print(f"Converting {amount} {from_currency} to {to_currency} at rate {rate}")
+        converted = amount * rate
+        return {"converted": round(converted, 6), "rate": round(rate, 8)}
+    
 
 if __name__ == "__main__":
-    # uvicorn.run(app, host="127.0.0.1", port=8001)
-    # uvicorn.run(mcp, host="127.0.0.1", port=8001)
-    # mcp.run()
-    mcp.run(
-        transport="http",
-        host="127.0.0.1",
-        port=8001,
-        path="/mcp",
+    CurrencyConverterMcpService.mcp.run(
+        transport=configs.TRANSPORT_TYPE,
+        host=configs.MCP_HOST,
+        port=configs.CURRENCY_CONVERTER_PORT,
+        path=configs.MCP_PATH,
         log_level="debug",
     )

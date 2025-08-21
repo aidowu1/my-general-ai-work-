@@ -7,25 +7,33 @@ import uvicorn
 from datetime import datetime
 import zoneinfo
 
-mcp = FastMCP("DatetimeMCP")
+import configs
 
-@mcp.tool()
-def get_current_datetime(timezone: str = "UTC") -> str:
-    """Return ISO datetime in requested tz (fallback to UTC)."""
-    try:
-        tz = zoneinfo.ZoneInfo(timezone)
-    except Exception:
-        tz = zoneinfo.ZoneInfo("UTC")
-    return datetime.now(tz).isoformat()
+class DatetimeCalculatorMcpService:
+    """
+    Datetime calculator service.
+    This service provides the current datetime in a specified timezone.
+    """
 
-# app = Starlette(routes=[Mount("/mcp", app=mcp.http_app(path='/mcp'))])
+    mcp = FastMCP("DatetimeMCP")
+
+    @staticmethod
+    @mcp.tool()
+    def get_current_datetime(timezone: str = "UTC") -> str:
+        """Return ISO datetime in requested tz (fallback to UTC)."""
+        try:
+            tz = zoneinfo.ZoneInfo(timezone)
+        except Exception:
+            tz = zoneinfo.ZoneInfo("UTC")
+        return datetime.now(tz).isoformat()
+
+
 
 if __name__ == "__main__":
-    # uvicorn.run(app, host="127.0.0.1", port=8002)
-    mcp.run(
-        transport="http",
-        host="127.0.0.1",
-        port=8002,
-        path="/mcp",
+    DatetimeCalculatorMcpService.mcp.run(
+        transport=configs.TRANSPORT_TYPE,
+        host=configs.MCP_HOST,
+        port=configs.CURRENCY_CONVERTER_PORT,  # Assuming same port as currency converter for simplicity
+        path=configs.MCP_PATH,
         log_level="debug",
     )
