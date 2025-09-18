@@ -1,0 +1,27 @@
+{
+  "name": "ONNX C++ Devcontainer (Dockerfile)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "ONNX_VERSION": "1.22.1"
+    }
+  },
+  "workspaceFolder": "/workspace",
+  // Bind the whole project into /workspace (so CMakeLists.txt and other files are visible)
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  // Explicitly ensure src is also bind-mounted (guarantees src is a host bind inside container)
+  "mounts": [
+    "source=${localWorkspaceFolder}/src,target=/workspace/src,type=bind,consistency=cached"
+  ],
+  "extensions": [
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  // optional: pre-configure a build dir (safe to fail)
+  "postCreateCommand": "mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug || true",
+  "shutdownAction": "stopContainer"
+}
