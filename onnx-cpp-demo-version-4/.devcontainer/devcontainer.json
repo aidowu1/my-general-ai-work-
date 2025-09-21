@@ -1,0 +1,24 @@
+{
+  "name": "ONNX C++ Devcontainer (Dockerfile)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "ONNX_VERSION": "1.19.0"  
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localWorkspaceFolder}/src,target=/workspace/src,type=bind,consistency=cached"
+  ],
+  "extensions": [
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "postCreateCommand": "mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug || true",
+  "shutdownAction": "stopContainer"
+}

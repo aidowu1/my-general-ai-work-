@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/onnx_demo.dir/src/main.cpp.o -o onnx_demo  -Wl,-rpath,/usr/local/lib /usr/local/lib/libonnxruntime.so 
