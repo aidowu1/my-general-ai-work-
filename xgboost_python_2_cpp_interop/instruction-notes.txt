@@ -1,0 +1,31 @@
+C++ inference setup
+===================
+1) Clone the Xgboost repo: 
+   => git clone --recursive https://github.com/dmlc/xgboost.git
+2) Build Xgboost code from Command Prompt following these steps:
+   => cd xgboost
+   => mkdir build
+   => cd build
+   => cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/xgboost"
+   => cmake --build . --config Release --target install
+3) The previous step will build/compile xgboost, creating a c:\xgboost\ folder which includes sub-folders: "C:/xgboost/include" and "C:/xgboost/lib". So this step will use a CMakeList.txt file to do cmake build (links) to xgboost complied library:
+   3.1) Create the CMakeList.txt (shlown below):
+   
+    cmake_minimum_required(VERSION 3.20)
+	project(xgb_predict_cpp VERSION 1.0 LANGUAGES CXX)
+
+	set(CMAKE_CXX_STANDARD 17)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+	# Adjust these paths to where xgboost installed
+	set(XGBOOST_INCLUDE_DIR "C:/xgboost/include")
+	set(XGBOOST_LIBRARY_DIR "C:/xgboost/lib")
+
+	include_directories(${XGBOOST_INCLUDE_DIR})
+	link_directories(${XGBOOST_LIBRARY_DIR})
+
+	add_executable(predict_xgb_cpp predict_xgb_cpp.cpp)
+	target_link_libraries(predict_xgb_cpp PRIVATE xgboost) # or xgboost.lib
+	
+   3.2) Open the folder containg the c++ code (predict_xgb_cpp.cpp) and the CMakeList.txt file using VS 2022 and run (Debug/Release). Ensure runtime can find xgboost.dll (place it next to executable or add to PATH) 
+  
