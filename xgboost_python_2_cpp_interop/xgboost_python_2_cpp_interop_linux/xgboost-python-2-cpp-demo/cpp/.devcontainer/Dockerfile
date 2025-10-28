@@ -35,9 +35,15 @@ RUN python3 -m pip install xgboost numpy pandas scikit-learn
 # Keep locale sane
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
+# Create workspace + extraction dir
+RUN mkdir -p /workspace /workspace/scripts
+
 # Copy devcontainer helper and scripts (post create will run later)
-COPY .devcontainer/postCreateCommand.sh /tmp/postCreateCommand.sh
-RUN chmod +x /tmp/postCreateCommand.sh
+# COPY /workspace/scripts/postCreateCommand.sh /tmp/postCreateCommand.sh
+COPY ./.devcontainer/postCreateCommand.sh /tmp/postCreateCommand.sh
+RUN chmod +x /tmp/postCreateCommand.sh 
+# COPY /scripts/postCreateCommand.sh /workspace/scripts/
+# RUN chmod +x /workspace/scripts/postCreateCommand.sh
 
 USER $USERNAME
 WORKDIR /workspace

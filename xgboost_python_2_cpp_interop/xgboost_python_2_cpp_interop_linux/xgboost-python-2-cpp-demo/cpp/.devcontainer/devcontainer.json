@@ -1,10 +1,11 @@
 {
   "name": "XGBoost C++ inference (Ubuntu devcontainer)",
   "build": {
+    "context": "..",
     "dockerfile": "Dockerfile"
   },
   "workspaceFolder": "/workspace",
-  "forwardPorts": [],
-  "postCreateCommand": "/tmp/postCreateCommand.sh",
+  "forwardPorts": [],   
+  "postCreateCommand": "sh /tmp/postCreateCommand.sh",
   "remoteUser": "vscode"
 }
