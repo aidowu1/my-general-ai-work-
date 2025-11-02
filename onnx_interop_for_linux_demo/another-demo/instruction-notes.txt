@@ -1,0 +1,146 @@
+Steup intructions
+=================
+
+Here is a step-by-step guide to implement C++ inference code for an ONNX XGBoost regressor model using Onnxruntime 1.19, CMake, Visual C++ 2022, and VS Code.
+
+Prerequisites
+1) VS Code: Installed with C/C++ extensions.
+2) Visual C++ 2022 Compiler: (Included in Visual Studio 2022 or Build Tools).
+3) CMake: Installed and added to the system PATH.
+4) Onnxruntime 1.19: Download the pre-built binaries for your platform (e.g., onnxruntime-win-x64-1.19.0) from the Onnxruntime GitHub releases page.
+5) An ONNX Model: A trained XGBoost regressor saved as model.onnx.
+
+Step 1: Project Setup and Directory Structure
+Create a new directory for your project. Inside it, create three files: CMakeLists.txt, main.cpp, and place your model.onnx file.
+
+your_project_dir/
+├── CMakeLists.txt
+├── main.cpp
+└── model.onnx
+
+Step 2: Configure the CMakeLists.txt File
+This file configures your project and tells CMake where to find the Onnxruntime libraries.
+Update the ONNX_RUNTIME_DIR variable to point to the location where you extracted the Onnxruntime 1.19 binaries.
+
+cmake_minimum_required(VERSION 3.12)
+project(OnnxXGBoostInference CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# --- Configure Onnxruntime Path ---
+# Replace this path with the actual path to your extracted onnxruntime directory
+set(ONNX_RUNTIME_DIR "C:/path/to/your/onnxruntime-win-x64-1.19.0") 
+
+# Find the Onnxruntime package
+find_package(onnxruntime REQUIRED CONFIG HINTS ${ONNX_RUNTIME_DIR}/lib/cmake/onnxruntime)
+message(STATUS "Found ONNX Runtime version: ${ONNXRUNTIME_VERSION}")
+
+# Add an executable target
+add_executable(XGBoostInference main.cpp)
+
+# Link the onnxruntime libraries to your executable
+target_link_libraries(XGBoostInference PRIVATE onnxruntime)
+
+
+Step 3: Write the C++ Inference Code (main.cpp)
+This code initializes the Onnxruntime environment, loads the model, prepares a dummy input tensor, runs the inference, and retrieves the output.
+
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <onnxruntime_cxx_api.h>
+
+int main() {
+    std::cout << "Starting ONNX Runtime C++ Inference" << std::endl;
+
+    // 1. Initialize the environment
+    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "XGBoostInference");
+    Ort::SessionOptions session_options;
+    session_options.SetIntraOpNumThreads(1);
+
+    // 2. Define the model path
+    const char* model_path = "model.onnx";
+
+    // 3. Create the session
+    // NOTE: On Windows, the path needs to be wchar_t* if using Ort::Session::Session(env, model_path, options)
+    // Here we convert it for compatibility.
+#ifdef _WIN32
+    std::wstring wide_model_path(model_path, model_path + strlen(model_path));
+    Ort::Session session(env, wide_model_path.c_str(), session_options);
+#else
+    Ort::Session session(env, model_path, session_options);
+#endif
+
+    // 4. Get input and output names (optional but good practice)
+    Ort::AllocatorWithDefaultOptions allocator;
+    const char* input_name = session.GetInputNameAllocated(0, allocator).get();
+    const char* output_name = session.GetOutputNameAllocated(0, allocator).get();
+
+    std::cout << "Input Name: " << input_name << ", Output Name: " << output_name << std::endl;
+
+    // 5. Prepare input data
+    // Assuming your XGBoost model expects a float input tensor
+    // For demonstration, we use a single sample with 2 features.
+    // Adjust dimensions based on your actual model's input shape.
+    std::vector<float> input_data = {1.0f, 2.5f}; // Example features
+    std::vector<int64_t> input_shape = {1, 2};   // Batch size 1, 2 features
+
+    size_t input_tensor_size = input_data.size();
+    
+    // Define memory info
+    Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
+
+    // Create input tensor
+    Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
+        memory_info, 
+        input_data.data(), 
+        input_tensor_size, 
+        input_shape.data(), 
+        input_shape.size()
+    );
+
+    // 6. Run inference
+    std::vector<Ort::Value> output_tensors;
+    try {
+        output_tensors = session.Run(Ort::RunOptions{nullptr}, &input_name, &input_tensor, 1, &output_name, 1);
+    } catch (const Ort::Exception& e) {
+        std::cerr << "Inference error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    // 7. Get output data
+    // XGBoost regressor typically outputs a single float value per sample
+    float* output_data = output_tensors[0].GetTensorMutableData<float>();
+    size_t output_elements = output_tensors[0].GetTensorTypeAndShapeInfo().GetElementCount();
+
+    std::cout << "Inference successful." << std::endl;
+    std::cout << "Output value(s): ";
+    for (size_t i = 0; i < output_elements; ++i) {
+        std::cout << output_data[i] << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+Step 4: Build and Run with VS Code and CMake
+1) Open the Project in VS Code: Open the your_project_dir folder in VS Code.
+2) Configure CMake:
+   => Open the Command Palette (Ctrl+Shift+P).
+   => Type and select "CMake: Configure".
+   => Choose the "MSVC v143 - x64" kit when prompted (this corresponds to Visual C++ 2022 64-bit).
+   => CMake will process the CMakeLists.txt file and generate build files. It should print Found ONNX Runtime version: 1.19.0.
+3) Build the Project:
+   => Open the Command Palette.
+   => Type and select "CMake: Build".
+      The executable XGBoostInference.exe will be created in your build directory (e.g., build/Debug/).
+4) Run the Executable:
+   => Navigate to your build output directory in a terminal.
+   => You need to ensure the onnxruntime DLL is in the same directory or in your PATH. Copy onnxruntime.dll from ${ONNX_RUNTIME_DIR}/lib into your build's output directory (e.g., build/Debug/).
+   => Run the executable: ./XGBoostInference.exe
+   => You should see the input/output names and the calculated output value(s) printed to the console.
+   => AI responses may include mistakes. Learn more
+
+
+
