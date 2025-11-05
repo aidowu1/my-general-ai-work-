@@ -1,0 +1,88 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, Bidirectional, LSTM, Dense, Dropout
+
+# Define key hyperparameters
+VOCAB_SIZE = 10000          # Size of the vocabulary (max number of unique words)
+EMBEDDING_DIM = 100         # Dimension of the word embeddings
+MAX_SEQUENCE_LENGTH = 128   # Max length of text sequences
+LSTM_UNITS = 64             # Number of units in the LSTM layer
+NUM_CLASSES = 3             # Number of output classes (e.g., positive, neutral, negative)
+DROPOUT_RATE = 0.2          # Dropout rate for regularization
+
+===================================================================================================
+
+def create_sentiment_model(vocab_size, embedding_dim, max_length, lstm_units, num_classes, dropout_rate):
+    model = Sequential([
+        # Step 1: Embedding Layer
+        # Converts word indices into dense vectors
+        Embedding(input_dim=vocab_size, 
+                  output_dim=embedding_dim, 
+                  input_length=max_length),
+        
+        # Step 2: Bidirectional LSTM Layer
+        # Processes the sequence in both directions to capture context
+        Bidirectional(LSTM(lstm_units, return_sequences=False)),
+        
+        # Step 3: Dropout Layer (Regularization)
+        # Prevents overfitting
+        Dropout(dropout_rate),
+        
+        # Step 4: Output Layer
+        # 3 neurons with 'softmax' activation for multi-class probability output
+        Dense(num_classes, activation='softmax')
+    ])
+    
+    return model
+
+# Initialize the model
+model = create_sentiment_model(VOCAB_SIZE, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH, 
+                               LSTM_UNITS, NUM_CLASSES, DROPOUT_RATE)
+
+=======================================================================================================
+
+# Compile the model for training
+# Use 'sparse_categorical_crossentropy' if your labels are integers (e.g., 0, 1, 2)
+# Use 'categorical_crossentropy' if your labels are one-hot encoded (e.g., [1,0,0], [0,1,0])
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Display the model architecture summary
+model.summary()
+
+
+========================================================================================================
+
+# Example of expected input data format
+# X_train: Padded sequences of word indices, shape (num_samples, MAX_SEQUENCE_LENGTH)
+# y_train: Integer labels for each sample, shape (num_samples,)
+
+# --- Example Data Creation (replace with your actual data loading) ---
+import numpy as np
+# Assuming we have 1000 samples for demonstration
+X_train = np.random.randint(1, VOCAB_SIZE, (1000, MAX_SEQUENCE_LENGTH)) 
+y_train = np.random.randint(0, NUM_CLASSES, (1000,)) # Labels 0, 1, or 2
+
+print(f"\nShape of X_train: {X_train.shape}")
+print(f"Shape of y_train: {y_train.shape}")
+
+
+=========================================================================================================
+
+# Train the model (replace num_epochs and batch_size as needed)
+EPOCHS = 5
+BATCH_SIZE = 32
+
+print("\nStarting training...")
+history = model.fit(
+    X_train, 
+    y_train, 
+    epochs=EPOCHS, 
+    batch_size=BATCH_SIZE,
+    validation_split=0.2 # Use 20% of the data for validation during training
+)
+print("Training complete.")
+
+
+==========================================================================================================

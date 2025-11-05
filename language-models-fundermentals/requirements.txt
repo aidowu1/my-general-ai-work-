@@ -1,0 +1,7 @@
+numpy 
+pandas 
+gensim
+scikit-learn
+tensorflow
+jupyterlab
+ipykernel
