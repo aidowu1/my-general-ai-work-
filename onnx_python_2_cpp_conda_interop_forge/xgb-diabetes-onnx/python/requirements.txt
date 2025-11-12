@@ -1,0 +1,9 @@
+joblib==1.4.2
+xgboost==1.7.6
+scikit-learn
+numpy
+pandas
+onnxruntime
+skl2onnx
+onnxmltools
+onnxconverter-common
