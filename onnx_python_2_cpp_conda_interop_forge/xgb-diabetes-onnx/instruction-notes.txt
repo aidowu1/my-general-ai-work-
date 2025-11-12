@@ -1,0 +1,5 @@
+conda activate xgb-ort
+cmake -S cpp -B build -G "Visual Studio 17 2022" -A X64 -DONNXRUNTIME_DIR="%CONDA_PREFIX%"
+cmake --build build
+cd build\Debug
+xgb_onnx_infer.exe
