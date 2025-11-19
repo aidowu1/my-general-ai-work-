@@ -1,0 +1,11 @@
+numpy 
+pandas 
+gensim
+scikit-learn
+tensorflow
+torch==2.4.0
+jupyterlab
+ipykernel
+yfinance
+matplotlib
+seaborn 
