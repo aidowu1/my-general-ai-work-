@@ -5,7 +5,26 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset, random_split
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import random
 import matplotlib.pyplot as plt
+
+# Reproducibility: set global random seeds
+SEED = 100
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
+
+# Make CUDA/cuDNN deterministic (may slow down training)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+# Optional: enforce deterministic algorithms on newer PyTorch versions
+try:
+    torch.use_deterministic_algorithms(True)
+except AttributeError:
+    pass
 
 def plot_loss(train_losses, val_losses):
     plt.plot(train_losses, label='Train Loss')
