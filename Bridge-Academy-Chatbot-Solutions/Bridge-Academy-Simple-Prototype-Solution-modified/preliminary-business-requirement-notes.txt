@@ -1,0 +1,19 @@
+Example student querys are: 
+  => When do I have "Further maths" and is there any homework due?
+  => What content was covered in the last "Further Maths" lesson?
+  => Can you provide a schedule of any upcoming tests for "Further Maths"
+  
+Example teacher querys are:
+  => What content did I teach in the last lesson for "Further Maths"
+     => This capability is assuming that the chatbot enables the teacher to upload details on what he/she has taught for a given subject
+  => Is there any homework/tests pending for the subjects I teach?
+  => When are my test marking deadlines due?
+  
+  
+1) Student wants to know the schedule of a particular class/module for a subject, additional details will include:
+   => Also is there any homework due
+   Example query is: When do I have further maths and is there any homework due?
+   
+
+2) Teacher wants to check what class/modules they teach for a particular subject, additionally the teacher wants to ascertain what tests/homework are due or need to be prepared.
+   

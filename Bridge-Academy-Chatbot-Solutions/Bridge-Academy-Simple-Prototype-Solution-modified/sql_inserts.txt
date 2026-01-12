@@ -1,0 +1,38 @@
+INSERT INTO subjects (name) VALUES 
+('Maths'),
+('French'),
+('Spanish'),
+('German'),
+('English'),
+('Physics'),
+('Biology'),
+('Chemistry'),
+('History'),
+('Geography'),
+('Music'),
+('Art & Design'),
+('Physical Education');
+
+-----------------------------------------------------------------------------------
+
+INSERT INTO teachers (name, subject_id) VALUES 
+('Dr. Aris Thorne', 1),
+('Ms. Elara Vance', 2),
+('Mr. Julian Reed', 3),
+('Mrs. Sarah Jenkins', 4),
+('Dr. Marcus Wu', 5);
+
+------------------------------------------------------------------------------------
+
+-- Format: (subject_id, teacher_id, day_of_week, start_time, end_time)
+INSERT INTO lessons (subject_id, teacher_id, day_of_week, start_time, end_time) VALUES 
+-- Monday Schedule for 10-Alpha
+(1, 2, 'Monday', '08:30:00', '09:30:00'), -- Math with Ms. Vance
+(1, 4, 'Monday', '09:45:00', '10:45:00'), -- English with Mrs. Jenkins
+
+-- Tuesday Schedule for 11-Beta
+(2, 1, 'Tuesday', '10:00:00', '11:00:00'), -- Physics with Dr. Thorne
+(2, 3, 'Tuesday', '11:15:00', '12:15:00'), -- Cybersecurity with Mr. Reed
+
+-- Wednesday Schedule for 12-Gamma
+(3, 5, 'Wednesday', '13:00:00', '14:30:00'); -- Biotech with Dr. Wu
