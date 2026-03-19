@@ -2,12 +2,14 @@ from datasets.circular_dataset import (CircularDatasetGenerator,
                                        CircularGaussianDataset,
                                        split_dataset
                                        )
+import torch
+import numpy as np
+from torch.utils.data import DataLoader
+
 from model import CircularAutoencoder  
 from trainer import Trainer
 from evaluator import reconstruction_errors, evaluate
 from plots import plot_roc_curve, plot_losses, plot_predictions
-import torch
-from torch.utils.data import DataLoader
 
 def inspect_loaders(train_loader, val_loader, test_loader):
     """Inspect and print first 10 samples from each data loader."""
@@ -41,7 +43,7 @@ def run_training_and_validation_cycle(
         trainer.val_losses.append(val_loss)
         print(f"Epoch {epoch+1}/{n_epochs} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}")
   
-    return model
+    return model, trainer
 
 
 def main():
@@ -63,7 +65,7 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = CircularAutoencoder()
-    trained_model = run_training_and_validation_cycle(device, model, train_loader, val_loader)
+    trained_model, trainer = run_training_and_validation_cycle(device, model, train_loader, val_loader)
 
     # -------- EVALUATION --------
     results = evaluate(trained_model, val_loader, device)
@@ -76,43 +78,15 @@ def main():
     print("Classification Report:")
     print(results['classification_report'])
 
-    # # -------- MODEL --------
+    #-------- PLOTS --------
+    plot_losses(trainer) 
+    test_errors, test_labels = reconstruction_errors(trained_model, test_loader, device)
+    plot_roc_curve(test_labels, test_errors)
 
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # model = Autoencoder(input_dim=2, latent_dim=2).to(device)
-
-    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    # criterion = torch.nn.MSELoss()
-
-    # trainer = Trainer(model, optimizer, criterion, device)
-
-    # # -------- TRAINING --------
-
-    # n_epochs = 50
-
-    # for epoch in range(n_epochs):
-
-    #     train_loss = trainer.train_epoch(train_loader)
-    #     val_loss = trainer.validate_epoch(val_loader)
-
-    #     trainer.train_losses.append(train_loss)
-    #     trainer.val_losses.append(val_loss)
-
-    #     print(f"Epoch {epoch+1}/{n_epochs} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}")
-
-    # # -------- EVALUATION --------
-
-    # results = evaluate(model, val_loader, device)
-
-    # print("Evaluation Results:")
-    # print(f"F1 Score: {results['f1_score']:.4f}")
-    # print(f"ROC AUC: {results['roc_auc']:.4f}")
-    # print("Confusion Matrix:")
-    # print(results['confusion_matrix'])
-    # print("Classification Report:")
-    # print(results['classification_report'])
-
+    # For visualization, we can use the test set and color by predicted anomaly scores
+    test_preds = (test_errors > np.percentile(test_errors, 95)).astype(int)
+    test_X = np.vstack([x.numpy() for x,_ in test_loader])
+    plot_predictions(test_X, test_preds)
 
 if __name__ == "__main__":
     main()
